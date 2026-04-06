@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:maya_e_wallet/features/auth/presentation/widgets/app_drawer.dart';
+import 'package:maya_e_wallet/features/wallet/presentation/cubits/wallet_cubit.dart';
+import 'package:maya_e_wallet/features/wallet/presentation/cubits/wallet_state.dart';
 import 'package:maya_e_wallet/features/wallet/presentation/utils/wallet_validators.dart';
 import 'package:maya_e_wallet/features/wallet/presentation/widgets/amount_input_field.dart';
 import 'package:maya_e_wallet/features/wallet/presentation/widgets/send_money/recipient_input_field.dart';
@@ -17,17 +20,19 @@ class SendMoneyScreen extends StatefulWidget {
 }
 
 class _SendMoneyScreenState extends State<SendMoneyScreen> {
-  static const double _balance = 500.00;
-
   late TextEditingController _recipientController;
   late TextEditingController _amountController;
 
-  bool _isLoading = false;
-  bool get _isFormValid =>
-      _recipientController.text.isNotEmpty &&
-      _amountController.text.isNotEmpty &&
-      WalletValidators.validateRecipient(_recipientController.text) == null &&
-      WalletValidators.validateAmount(_amountController.text, _balance) == null;
+  double _currentBalance = 500.00; // Default value
+
+  bool get _isFormValid {
+    if (_recipientController.text.isEmpty || _amountController.text.isEmpty) {
+      return false;
+    }
+    return WalletValidators.validateRecipient(_recipientController.text) == null &&
+        WalletValidators.validateAmount(_amountController.text, _currentBalance) ==
+            null;
+  }
 
   @override
   void initState() {
@@ -54,27 +59,90 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
     final recipient = _recipientController.text;
     final amount = double.parse(_amountController.text);
 
+    FocusScope.of(context).unfocus();
+
     showDialog(
       context: context,
       builder: (context) => SendMoneyConfirmationDialog(
         recipient: recipient,
         amount: amount,
-        onConfirm: _submitForm,
+        onConfirm: () => _submitForm(recipient, amount),
       ),
     );
   }
 
-  void _submitForm() {
-    setState(() {
-      _isLoading = true;
-    });
+  void _submitForm(String recipient, double amount) {
+    context.read<WalletCubit>().sendMoney(recipient, amount);
+  }
 
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-      _showSuccessDialog();
-    }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      drawer: const AppDrawer(),
+      appBar: AppBar(
+        title: const Text('Send Money'),
+      ),
+      body: SafeArea(
+        child: BlocListener<WalletCubit, WalletState>(
+          listener: (context, state) {
+            if (state is ActionSuccess) {
+              _showSuccessDialog();
+            } else if (state is ActionFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          },
+          child: BlocBuilder<WalletCubit, WalletState>(
+            builder: (context, state) {
+              if (state is WalletLoaded) {
+                _currentBalance = state.wallet.balance;
+              }
+
+              final isLoading = state is ActionInProgress;
+
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    children: [
+                      RecipientInputField(
+                        controller: _recipientController,
+                        validator: WalletValidators.validateRecipient,
+                        enabled: !isLoading,
+                      ),
+                      const SizedBox(height: 24.0),
+                      AmountInputField(
+                        controller: _amountController,
+                        maxAmount: _currentBalance,
+                        helperText:
+                            'Available balance: ₱${_currentBalance.toStringAsFixed(2)}',
+                        validator: (value) =>
+                            WalletValidators.validateAmount(value, _currentBalance),
+                        enabled: !isLoading,
+                      ),
+                      const SizedBox(height: 24.0),
+                      SendMoneyActionButton(
+                        enabled: _isFormValid && !isLoading,
+                        isLoading: isLoading,
+                        onPressed: _showConfirmationDialog,
+                      ),
+                      const SizedBox(height: 16.0),
+                      CancelButton(
+                        onPressed: isLoading ? () {} : () => context.pop(),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
   }
 
   void _showSuccessDialog() {
@@ -87,49 +155,6 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
       builder: (context) => SendMoneySuccessDialog(
         amount: amount,
         recipient: recipient,
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: const AppDrawer(),
-      appBar: AppBar(
-        title: const Text('Send Money'),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              children: [
-                RecipientInputField(
-                  controller: _recipientController,
-                  validator: WalletValidators.validateRecipient,
-                ),
-                const SizedBox(height: 24.0),
-                AmountInputField(
-                  controller: _amountController,
-                  maxAmount: _balance,
-                  helperText: 'Available balance: ₱${_balance.toStringAsFixed(2)}',
-                  validator: (value) =>
-                      WalletValidators.validateAmount(value, _balance),
-                ),
-                const SizedBox(height: 24.0),
-                SendMoneyActionButton(
-                  enabled: _isFormValid,
-                  isLoading: _isLoading,
-                  onPressed: _showConfirmationDialog,
-                ),
-                const SizedBox(height: 16.0),
-                CancelButton(
-                  onPressed: () => context.pop(),
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:maya_e_wallet/features/auth/presentation/widgets/app_drawer.dart';
+import 'package:maya_e_wallet/features/wallet/presentation/cubits/wallet_cubit.dart';
+import 'package:maya_e_wallet/features/wallet/presentation/cubits/wallet_state.dart';
 import 'package:maya_e_wallet/features/wallet/presentation/utils/wallet_validators.dart';
 import 'package:maya_e_wallet/features/wallet/presentation/widgets/cash_in/cash_in_amount_input_field.dart';
 import 'package:maya_e_wallet/features/wallet/presentation/widgets/cash_in/cash_in_action_button.dart';
@@ -20,7 +23,6 @@ class _CashInScreenState extends State<CashInScreen> {
   static const String _source = 'GCash Account';
 
   late TextEditingController _amountController;
-  bool _isLoading = false;
 
   bool get _isFormValid {
     final text = _amountController.text;
@@ -53,27 +55,21 @@ class _CashInScreenState extends State<CashInScreen> {
   void _showConfirmationDialog() {
     final amount = double.parse(_amountController.text);
 
+    // Dismiss keyboard before showing dialog
+    FocusScope.of(context).unfocus();
+
     showDialog(
       context: context,
       builder: (context) => CashInConfirmationDialog(
         amount: amount,
         source: _source,
-        onConfirm: _submitForm,
+        onConfirm: () => _submitForm(amount),
       ),
     );
   }
 
-  void _submitForm() {
-    setState(() {
-      _isLoading = true;
-    });
-
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-      _showSuccessDialog();
-    }
+  void _submitForm(double amount) {
+    context.read<WalletCubit>().cashIn(amount);
   }
 
   void _showSuccessDialog() {
@@ -96,36 +92,52 @@ class _CashInScreenState extends State<CashInScreen> {
         title: const Text('Cash In'),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              children: [
-                // Amount Input with Progress
-                CashInAmountInputField(
-                  controller: _amountController,
-                  maxAmount: _maxCashIn,
-                  validator: (value) => WalletValidators.validateCashInAmount(
-                    value,
-                    maxAmount: _maxCashIn,
+        child: BlocListener<WalletCubit, WalletState>(
+          listener: (context, state) {
+            if (state is ActionSuccess) {
+              _showSuccessDialog();
+            } else if (state is ActionFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          },
+          child: BlocBuilder<WalletCubit, WalletState>(
+            builder: (context, state) {
+              final isLoading = state is ActionInProgress;
+
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    children: [
+                      CashInAmountInputField(
+                        controller: _amountController,
+                        maxAmount: _maxCashIn,
+                        validator: (value) => WalletValidators.validateCashInAmount(
+                          value,
+                          maxAmount: _maxCashIn,
+                        ),
+                        enabled: !isLoading,
+                      ),
+                      const SizedBox(height: 16.0),
+                      CashInActionButton(
+                        enabled: _isFormValid && !isLoading,
+                        isLoading: isLoading,
+                        onPressed: _showConfirmationDialog,
+                      ),
+                      const SizedBox(height: 16.0),
+                      CancelButton(
+                        onPressed: isLoading ? () {} : () => context.pop(),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 16.0),
-
-                // Confirm Cash In Button
-                CashInActionButton(
-                  enabled: _isFormValid,
-                  isLoading: _isLoading,
-                  onPressed: _showConfirmationDialog,
-                ),
-                const SizedBox(height: 16.0),
-
-                // Cancel Button
-                CancelButton(
-                  onPressed: () => context.pop(),
-                ),
-              ],
-            ),
+              );
+            },
           ),
         ),
       ),
