@@ -3,11 +3,15 @@ import 'package:go_router/go_router.dart';
 import 'package:maya_e_wallet/features/auth/presentation/cubits/auth_cubit.dart';
 import 'package:maya_e_wallet/features/auth/presentation/cubits/auth_state.dart';
 import 'package:maya_e_wallet/features/auth/presentation/login_screen.dart';
-import 'package:maya_e_wallet/features/wallet/presentation/wallet_screen.dart';
+import 'package:maya_e_wallet/features/wallet/presentation/screens/wallet_screen.dart';
+import 'package:maya_e_wallet/features/wallet/presentation/screens/send_money_screen.dart';
+import 'package:maya_e_wallet/features/wallet/presentation/screens/cash_in_screen.dart';
 
 enum AppRoute {
   login,
   wallet,
+  sendMoney,
+  cashIn,
 }
 
 class AppRouter {
@@ -32,12 +36,24 @@ class AppRouter {
     },
     routes: [
       GoRoute(
+        name: AppRoute.login.name,
         path: '/${AppRoute.login.name}',
         builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
+        name: AppRoute.wallet.name,
         path: '/${AppRoute.wallet.name}',
         builder: (context, state) => const WalletScreen(),
+      ),
+      GoRoute(
+        name: AppRoute.sendMoney.name,
+        path: '/${AppRoute.sendMoney.name}',
+        builder: (context, state) => const SendMoneyScreen(),
+      ),
+      GoRoute(
+        name: AppRoute.cashIn.name,
+        path: '/${AppRoute.cashIn.name}',
+        builder: (context, state) => const CashInScreen(),
       ),
     ],
   );
