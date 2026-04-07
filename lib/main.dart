@@ -11,6 +11,10 @@ import 'package:maya_e_wallet/features/wallet/domain/usecases/cash_in_usecase.da
 import 'package:maya_e_wallet/features/wallet/domain/usecases/get_balance_usecase.dart';
 import 'package:maya_e_wallet/features/wallet/domain/usecases/send_money_usecase.dart';
 import 'package:maya_e_wallet/features/wallet/presentation/cubits/wallet_cubit.dart';
+import 'package:maya_e_wallet/features/transaction/data/datasources/local_transaction_datasource.dart';
+import 'package:maya_e_wallet/features/transaction/data/repositories/transaction_repository_impl.dart';
+import 'package:maya_e_wallet/features/transaction/domain/usecases/get_transactions_usecase.dart';
+import 'package:maya_e_wallet/features/transaction/presentation/cubits/transaction_cubit.dart';
 
 void main() {
   // Initialize Auth dependencies
@@ -25,11 +29,19 @@ void main() {
   final sendMoneyUseCase = SendMoneyUseCase(walletRepository);
   final cashInUseCase = CashInUseCase(walletRepository);
 
+  // Initialize Transaction dependencies
+  final localTransactionDataSource = LocalTransactionDataSource();
+  final transactionRepository = TransactionRepositoryImpl(
+    localDataSource: localTransactionDataSource,
+  );
+  final getTransactionsUseCase = GetTransactionsUseCase(transactionRepository);
+
   runApp(MyApp(
     loginUseCase: loginUseCase,
     getBalanceUseCase: getBalanceUseCase,
     sendMoneyUseCase: sendMoneyUseCase,
     cashInUseCase: cashInUseCase,
+    getTransactionsUseCase: getTransactionsUseCase,
   ));
 }
 
@@ -38,12 +50,14 @@ class MyApp extends StatelessWidget {
   final GetBalanceUseCase getBalanceUseCase;
   final SendMoneyUseCase sendMoneyUseCase;
   final CashInUseCase cashInUseCase;
+  final GetTransactionsUseCase getTransactionsUseCase;
 
   const MyApp({
     required this.loginUseCase,
     required this.getBalanceUseCase,
     required this.sendMoneyUseCase,
     required this.cashInUseCase,
+    required this.getTransactionsUseCase,
     super.key,
   });
 
@@ -59,6 +73,11 @@ class MyApp extends StatelessWidget {
             getBalanceUseCase: getBalanceUseCase,
             sendMoneyUseCase: sendMoneyUseCase,
             cashInUseCase: cashInUseCase,
+          ),
+        ),
+        BlocProvider(
+          create: (context) => TransactionCubit(
+            getTransactionsUseCase: getTransactionsUseCase,
           ),
         ),
       ],

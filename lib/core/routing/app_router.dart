@@ -6,12 +6,14 @@ import 'package:maya_e_wallet/features/auth/presentation/login_screen.dart';
 import 'package:maya_e_wallet/features/wallet/presentation/screens/wallet_screen.dart';
 import 'package:maya_e_wallet/features/wallet/presentation/screens/send_money_screen.dart';
 import 'package:maya_e_wallet/features/wallet/presentation/screens/cash_in_screen.dart';
+import 'package:maya_e_wallet/features/transaction/presentation/transactions_screen.dart';
 
 enum AppRoute {
   login,
   wallet,
   sendMoney,
   cashIn,
+  transactions,
 }
 
 class AppRouter {
@@ -54,6 +56,11 @@ class AppRouter {
         name: AppRoute.cashIn.name,
         path: '/${AppRoute.cashIn.name}',
         builder: (context, state) => const CashInScreen(),
+      ),
+      GoRoute(
+        name: AppRoute.transactions.name,
+        path: '/${AppRoute.transactions.name}',
+        builder: (context, state) => const TransactionsScreen(),
       ),
     ],
   );

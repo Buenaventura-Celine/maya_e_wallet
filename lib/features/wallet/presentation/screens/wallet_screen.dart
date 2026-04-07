@@ -5,6 +5,7 @@ import 'package:maya_e_wallet/core/routing/app_router.dart';
 import 'package:maya_e_wallet/features/auth/presentation/widgets/app_drawer.dart';
 import 'package:maya_e_wallet/features/wallet/presentation/cubits/wallet_cubit.dart';
 import 'package:maya_e_wallet/features/wallet/presentation/cubits/wallet_state.dart';
+import 'package:maya_e_wallet/features/wallet/presentation/widgets/view_transaction_button.dart';
 import 'package:maya_e_wallet/features/wallet/presentation/widgets/wallet/cash_in_button.dart';
 import 'package:maya_e_wallet/features/wallet/presentation/widgets/wallet/send_money_button.dart';
 import 'package:maya_e_wallet/features/wallet/presentation/widgets/wallet/wallet_header.dart';
@@ -84,6 +85,8 @@ class _WalletScreenState extends State<WalletScreen> {
                             ),
                           ],
                         ),
+                        const SizedBox(height: 24.0),
+                        const ViewTransactionButton(),
                       ],
                     ),
                   ),
