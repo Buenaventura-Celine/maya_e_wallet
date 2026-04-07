@@ -51,6 +51,7 @@ For better viewing of markdown documentation files (`.md`), you can install the 
 
 This will help you read the project documentation more clearly:
 - `README.md` - Main project documentation
+- `DESIGN_DOCUMENTATION.md` - Architecture, class diagrams, and sequence diagrams
 - `lib/features/auth/README.md` - Auth feature documentation
 - `lib/features/transaction/README.md` - Transaction feature documentation
 
