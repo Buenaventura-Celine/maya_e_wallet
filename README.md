@@ -33,6 +33,27 @@ cd maya_e_wallet
 flutter pub get
 ```
 
+### 2.1 (Optional) Install Markdown Preview Extension
+
+For better viewing of markdown documentation files (`.md`), you can install the **Markdown Preview Enhanced** extension in your code editor:
+
+**For VS Code:**
+- Open Extensions (Ctrl+Shift+X / Cmd+Shift+X)
+- Search for "Markdown Preview Enhanced"
+- Install by Yiyi Wang
+- Right-click any `.md` file and select "Open Preview" or press Ctrl+K V
+
+**Benefits:**
+- Better formatted preview of README and feature documentation
+- Syntax highlighting
+- Table rendering
+- Easier navigation through documentation
+
+This will help you read the project documentation more clearly:
+- `README.md` - Main project documentation
+- `lib/features/auth/README.md` - Auth feature documentation
+- `lib/features/transaction/README.md` - Transaction feature documentation
+
 ### 3. Run the Application
 
 For iOS:
@@ -56,7 +77,103 @@ flutter run
 ```
 to run on the default connected device or emulator.
 
-### 4. Build for Release
+### 4. Login Credentials
+
+Once the application is running, use the following test credentials to log in:
+
+| Field | Value |
+|-------|-------|
+| **Username** | `test123` |
+| **Password** | `test123` |
+
+**Note:** These are hardcoded credentials for testing and development purposes. In a production environment, authentication should use a real backend API.
+
+**Demo Credentials Display:**
+The login screen displays these credentials in a helpful card labeled "Demo Credentials" for easy reference during testing.
+
+### 5. Running Tests
+
+The project includes comprehensive unit and widget tests with 100% passing rate.
+
+#### Run All Tests
+
+```bash
+flutter test
+```
+
+#### Run Tests with Coverage Report
+
+```bash
+flutter test --coverage
+```
+
+This generates a `coverage/` directory with coverage data.
+
+#### Run Tests for a Specific Feature
+
+```bash
+# Auth feature tests
+flutter test test/features/auth/
+
+# Transaction feature tests
+flutter test test/features/transaction/
+```
+
+#### Run Tests with Verbose Output
+
+```bash
+flutter test -v
+```
+
+#### Run a Specific Test File
+
+```bash
+flutter test test/features/auth/presentation/screens/login_screen_test.dart
+```
+
+#### Run Tests and Watch for Changes
+
+```bash
+flutter test --watch
+```
+
+#### Test Coverage Information
+
+The project has comprehensive test coverage across all layers:
+
+**Auth Feature:** 41 tests (100% passing)
+- Domain layer: LoginUseCase tests
+- Data layer: PasswordUtils, LocalAuthDataSource, AuthRepositoryImpl tests
+- Presentation layer: AuthCubit, LoginScreen tests
+
+**Transaction Feature:** 993+ lines of tests
+- Domain layer: Use case tests for getting, recording cash-in, and recording send transactions
+- Data layer: TransactionModel JSON serialization/deserialization tests
+- Presentation layer: TransactionCubit, TransactionListItem, TransactionsScreen tests
+
+#### Viewing Test Results
+
+After running tests, you'll see output like:
+
+```
+✓ All tests passed!
+
+Ran 41 tests in test/features/auth/ (X.XXs)
+```
+
+Each test file includes:
+- Unit tests for business logic (domain layer)
+- Data tests for models and repositories (data layer)
+- Widget tests for UI components (presentation layer)
+- BLoC tests for state management using `bloc_test`
+
+#### Testing Tools Used
+
+- **flutter_test**: Core testing framework
+- **mocktail**: Mocking and stubbing
+- **bloc_test**: BLoC/Cubit state testing
+
+### 6. Build for Release
 
 For Android:
 ```bash
