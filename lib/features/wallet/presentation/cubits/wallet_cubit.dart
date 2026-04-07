@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:maya_e_wallet/features/transaction/presentation/cubits/transaction_cubit.dart';
 import 'package:maya_e_wallet/features/wallet/domain/entities/wallet_entity.dart';
 import 'package:maya_e_wallet/features/wallet/domain/usecases/cash_in_usecase.dart';
 import 'package:maya_e_wallet/features/wallet/domain/usecases/get_balance_usecase.dart';
@@ -9,11 +10,13 @@ class WalletCubit extends Cubit<WalletState> {
   final GetBalanceUseCase getBalanceUseCase;
   final SendMoneyUseCase sendMoneyUseCase;
   final CashInUseCase cashInUseCase;
+  final TransactionCubit? transactionCubit;
 
   WalletCubit({
     required this.getBalanceUseCase,
     required this.sendMoneyUseCase,
     required this.cashInUseCase,
+    this.transactionCubit,
   }) : super(const WalletInitial());
 
   Future<void> loadBalance() async {
@@ -42,6 +45,11 @@ class WalletCubit extends Cubit<WalletState> {
       emit(const ActionInProgress());
       await sendMoneyUseCase(recipient, amount);
 
+      // Refresh transaction list
+      if (transactionCubit != null) {
+        await transactionCubit!.loadTransactions();
+      }
+
       emit(ActionSuccess(message: 'Money sent successfully to $recipient'));
     } catch (e) {
       emit(ActionFailure(message: 'Failed to send money: ${e.toString()}'));
@@ -53,6 +61,11 @@ class WalletCubit extends Cubit<WalletState> {
     try {
       emit(const ActionInProgress());
       await cashInUseCase(amount);
+
+      // Refresh transaction list
+      if (transactionCubit != null) {
+        await transactionCubit!.loadTransactions();
+      }
 
       emit(ActionSuccess(
           message:

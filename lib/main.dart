@@ -15,6 +15,8 @@ import 'package:maya_e_wallet/features/wallet/presentation/cubits/wallet_cubit.d
 import 'package:maya_e_wallet/features/transaction/data/datasources/remote_transaction_datasource.dart';
 import 'package:maya_e_wallet/features/transaction/data/repositories/transaction_repository_impl.dart';
 import 'package:maya_e_wallet/features/transaction/domain/usecases/get_transactions_usecase.dart';
+import 'package:maya_e_wallet/features/transaction/domain/usecases/record_send_money_transaction_usecase.dart';
+import 'package:maya_e_wallet/features/transaction/domain/usecases/record_cash_in_transaction_usecase.dart';
 import 'package:maya_e_wallet/features/transaction/presentation/cubits/transaction_cubit.dart';
 
 void main() {
@@ -23,14 +25,7 @@ void main() {
   final authRepository = AuthRepositoryImpl(localDataSource: localAuthDataSource);
   final loginUseCase = LoginUseCase(authRepository);
 
-  // Initialize Wallet dependencies
-  final localWalletDataSource = LocalWalletDataSourceImpl();
-  final walletRepository = WalletRepositoryImpl(localDataSource: localWalletDataSource);
-  final getBalanceUseCase = GetBalanceUseCase(walletRepository);
-  final sendMoneyUseCase = SendMoneyUseCase(walletRepository);
-  final cashInUseCase = CashInUseCase(walletRepository);
-
-  // Initialize Transaction dependencies
+  // Initialize Transaction dependencies (needed before Wallet)
   final httpClient = http.Client();
   final remoteTransactionDataSource = RemoteTransactionDataSource(
     httpClient: httpClient,
@@ -39,6 +34,24 @@ void main() {
     remoteDataSource: remoteTransactionDataSource,
   );
   final getTransactionsUseCase = GetTransactionsUseCase(transactionRepository);
+  final recordSendMoneyTransactionUseCase =
+      RecordSendMoneyTransactionUseCase(transactionRepository);
+  final recordCashInTransactionUseCase =
+      RecordCashInTransactionUseCase(transactionRepository);
+
+  // Initialize Wallet dependencies
+  final localWalletDataSource = LocalWalletDataSourceImpl();
+  final walletRepository =
+      WalletRepositoryImpl(localDataSource: localWalletDataSource);
+  final getBalanceUseCase = GetBalanceUseCase(walletRepository);
+  final sendMoneyUseCase = SendMoneyUseCase(
+    walletRepository,
+    recordTransactionUseCase: recordSendMoneyTransactionUseCase,
+  );
+  final cashInUseCase = CashInUseCase(
+    walletRepository,
+    recordTransactionUseCase: recordCashInTransactionUseCase,
+  );
 
   runApp(MyApp(
     loginUseCase: loginUseCase,
@@ -73,15 +86,16 @@ class MyApp extends StatelessWidget {
           create: (context) => AuthCubit(loginUseCase: loginUseCase),
         ),
         BlocProvider(
+          create: (context) => TransactionCubit(
+            getTransactionsUseCase: getTransactionsUseCase,
+          ),
+        ),
+        BlocProvider(
           create: (context) => WalletCubit(
             getBalanceUseCase: getBalanceUseCase,
             sendMoneyUseCase: sendMoneyUseCase,
             cashInUseCase: cashInUseCase,
-          ),
-        ),
-        BlocProvider(
-          create: (context) => TransactionCubit(
-            getTransactionsUseCase: getTransactionsUseCase,
+            transactionCubit: context.read<TransactionCubit>(),
           ),
         ),
       ],

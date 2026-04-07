@@ -5,11 +5,36 @@ import 'package:maya_e_wallet/features/transaction/domain/repositories/transacti
 class TransactionRepositoryImpl implements TransactionRepository {
   final RemoteTransactionDataSource remoteDataSource;
 
-  TransactionRepositoryImpl({required this.remoteDataSource});
+  TransactionRepositoryImpl({
+    required this.remoteDataSource,
+  });
 
   @override
   Future<List<TransactionEntity>> getTransactions() async {
-    final remoteTransactions = await remoteDataSource.getTransactions();
-    return remoteTransactions.cast<TransactionEntity>();
+    try {
+      final remoteTransactions = await remoteDataSource.getTransactions();
+      return remoteTransactions.cast<TransactionEntity>();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<TransactionEntity> recordTransaction({
+    required String type,
+    required double amount,
+    required String recipient,
+  }) async {
+    try {
+      // Record remotely
+      final transaction = await remoteDataSource.recordTransaction(
+        type: type,
+        amount: amount,
+        recipient: recipient,
+      );
+      return transaction;
+    } catch (e) {
+      rethrow;
+    }
   }
 }

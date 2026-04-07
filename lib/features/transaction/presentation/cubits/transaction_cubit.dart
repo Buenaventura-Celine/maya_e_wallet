@@ -12,7 +12,10 @@ class TransactionCubit extends Cubit<TransactionState> {
     emit(const TransactionLoading());
     try {
       final transactions = await getTransactionsUseCase();
-      emit(TransactionLoaded(transactions));
+      // Sort transactions in reverse order (most recent first)
+      final sortedTransactions = transactions.toList()
+        ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
+      emit(TransactionLoaded(sortedTransactions));
     } catch (e) {
       emit(TransactionError(e.toString()));
     }

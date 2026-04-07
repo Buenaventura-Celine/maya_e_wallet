@@ -11,12 +11,39 @@ class TransactionModel extends TransactionEntity {
   });
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) {
+    final dateTimeValue = json['dateTime'];
+    final DateTime parsedDateTime;
+
+    try {
+      if (dateTimeValue is String) {
+        // Handle ISO 8601 string format
+        parsedDateTime = DateTime.parse(dateTimeValue);
+      } else if (dateTimeValue is num) {
+        // Handle Unix timestamp (seconds since epoch)
+        final timestampInSeconds = dateTimeValue.toInt();
+        parsedDateTime = DateTime.fromMillisecondsSinceEpoch(
+          timestampInSeconds * 1000,
+        );
+      } else if (dateTimeValue == null) {
+        // Default to current time if missing
+        parsedDateTime = DateTime.now();
+      } else {
+        throw FormatException(
+          'Invalid dateTime format. Expected String, num, or null, got: ${dateTimeValue.runtimeType} with value: $dateTimeValue',
+        );
+      }
+    } catch (e) {
+      throw FormatException(
+        'Error parsing dateTime: $e\nValue: $dateTimeValue\nFull JSON: $json',
+      );
+    }
+
     return TransactionModel(
-      id: json['id'] as String,
+      id: json['id'].toString(),
       type: json['type'] as String,
       amount: (json['amount'] as num).toDouble(),
       recipient: json['recipient'] as String,
-      dateTime: DateTime.parse(json['dateTime'] as String),
+      dateTime: parsedDateTime,
       status: json['status'] as String? ?? 'completed',
     );
   }
