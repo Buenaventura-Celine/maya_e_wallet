@@ -38,10 +38,7 @@ class _WalletScreenState extends State<WalletScreen> {
       body: BlocListener<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is AuthInitial) {
-            Navigator.of(context).pushNamedAndRemoveUntil(
-              '/${AppRoute.login.name}',
-              (route) => false,
-            );
+            context.goNamed(AppRoute.login.name);
           }
         },
         child: SafeArea(
