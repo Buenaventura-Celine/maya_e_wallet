@@ -1,15 +1,15 @@
-import 'package:maya_e_wallet/features/transaction/data/datasources/local_transaction_datasource.dart';
+import 'package:maya_e_wallet/features/transaction/data/datasources/remote_transaction_datasource.dart';
 import 'package:maya_e_wallet/features/transaction/domain/entities/transaction_entity.dart';
 import 'package:maya_e_wallet/features/transaction/domain/repositories/transaction_repository.dart';
 
 class TransactionRepositoryImpl implements TransactionRepository {
-  final LocalTransactionDataSource localDataSource;
+  final RemoteTransactionDataSource remoteDataSource;
 
-  TransactionRepositoryImpl({required this.localDataSource});
+  TransactionRepositoryImpl({required this.remoteDataSource});
 
   @override
   Future<List<TransactionEntity>> getTransactions() async {
-    final models = await localDataSource.getTransactions();
-    return models.cast<TransactionEntity>();
+    final remoteTransactions = await remoteDataSource.getTransactions();
+    return remoteTransactions.cast<TransactionEntity>();
   }
 }

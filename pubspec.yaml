@@ -38,6 +38,7 @@ dependencies:
   flutter_bloc: ^8.1.0            # State Management
   equatable: ^2.0.0               # Value Equality
   crypto: ^3.0.7                  # Password Hashing
+  http: ^1.1.0                    # HTTP Client
 
 dev_dependencies:
   flutter_test:

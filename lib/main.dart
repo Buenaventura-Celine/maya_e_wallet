@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart' as http;
 import 'package:maya_e_wallet/core/routing/app_router.dart';
 import 'package:maya_e_wallet/features/auth/data/datasources/local_auth_datasource.dart';
 import 'package:maya_e_wallet/features/auth/data/repositories/auth_repository_impl.dart';
@@ -11,7 +12,7 @@ import 'package:maya_e_wallet/features/wallet/domain/usecases/cash_in_usecase.da
 import 'package:maya_e_wallet/features/wallet/domain/usecases/get_balance_usecase.dart';
 import 'package:maya_e_wallet/features/wallet/domain/usecases/send_money_usecase.dart';
 import 'package:maya_e_wallet/features/wallet/presentation/cubits/wallet_cubit.dart';
-import 'package:maya_e_wallet/features/transaction/data/datasources/local_transaction_datasource.dart';
+import 'package:maya_e_wallet/features/transaction/data/datasources/remote_transaction_datasource.dart';
 import 'package:maya_e_wallet/features/transaction/data/repositories/transaction_repository_impl.dart';
 import 'package:maya_e_wallet/features/transaction/domain/usecases/get_transactions_usecase.dart';
 import 'package:maya_e_wallet/features/transaction/presentation/cubits/transaction_cubit.dart';
@@ -30,9 +31,12 @@ void main() {
   final cashInUseCase = CashInUseCase(walletRepository);
 
   // Initialize Transaction dependencies
-  final localTransactionDataSource = LocalTransactionDataSource();
+  final httpClient = http.Client();
+  final remoteTransactionDataSource = RemoteTransactionDataSource(
+    httpClient: httpClient,
+  );
   final transactionRepository = TransactionRepositoryImpl(
-    localDataSource: localTransactionDataSource,
+    remoteDataSource: remoteTransactionDataSource,
   );
   final getTransactionsUseCase = GetTransactionsUseCase(transactionRepository);
 
