@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:maya_e_wallet/features/auth/domain/entities/user.dart';
 import 'package:maya_e_wallet/features/auth/presentation/cubits/auth_cubit.dart';
 import 'package:maya_e_wallet/features/auth/presentation/cubits/auth_state.dart';
 import 'package:maya_e_wallet/features/wallet/domain/entities/wallet_entity.dart';
@@ -41,8 +42,8 @@ void main() {
       when(() => mockWalletCubit.stream)
           .thenAnswer((_) => Stream.value(const WalletLoading()));
       when(() => mockWalletCubit.loadBalance()).thenAnswer((_) async => {});
-      when(() => mockAuthCubit.state).thenReturn(const AuthInitial());
-      when(() => mockAuthCubit.stream).thenAnswer((_) => Stream.value(const AuthInitial()));
+      when(() => mockAuthCubit.state).thenReturn(const AuthSuccess(user: User(username: 'testuser')));
+      when(() => mockAuthCubit.stream).thenAnswer((_) => Stream.value(const AuthSuccess(user: User(username: 'testuser'))));
 
       // Act
       await tester.pumpWidget(buildTestWidget());
@@ -60,8 +61,8 @@ void main() {
       when(() => mockWalletCubit.stream)
           .thenAnswer((_) => Stream.value(const WalletLoaded(wallet: walletEntity)));
       when(() => mockWalletCubit.loadBalance()).thenAnswer((_) async => {});
-      when(() => mockAuthCubit.state).thenReturn(const AuthInitial());
-      when(() => mockAuthCubit.stream).thenAnswer((_) => Stream.value(const AuthInitial()));
+      when(() => mockAuthCubit.state).thenReturn(const AuthSuccess(user: User(username: 'testuser')));
+      when(() => mockAuthCubit.stream).thenAnswer((_) => Stream.value(const AuthSuccess(user: User(username: 'testuser'))));
 
       // Act
       await tester.pumpWidget(buildTestWidget());
@@ -81,8 +82,8 @@ void main() {
       when(() => mockWalletCubit.stream)
           .thenAnswer((_) => Stream.value(const WalletLoaded(wallet: walletEntity)));
       when(() => mockWalletCubit.loadBalance()).thenAnswer((_) async => {});
-      when(() => mockAuthCubit.state).thenReturn(const AuthInitial());
-      when(() => mockAuthCubit.stream).thenAnswer((_) => Stream.value(const AuthInitial()));
+      when(() => mockAuthCubit.state).thenReturn(const AuthSuccess(user: User(username: 'testuser')));
+      when(() => mockAuthCubit.stream).thenAnswer((_) => Stream.value(const AuthSuccess(user: User(username: 'testuser'))));
 
       // Act
       await tester.pumpWidget(buildTestWidget());
@@ -103,8 +104,8 @@ void main() {
           .thenAnswer((_) => Stream.value(const WalletLoaded(wallet: walletEntity)));
       when(() => mockWalletCubit.loadBalance()).thenAnswer((_) async => {});
       when(() => mockWalletCubit.toggleBalanceVisibility()).thenReturn(null);
-      when(() => mockAuthCubit.state).thenReturn(const AuthInitial());
-      when(() => mockAuthCubit.stream).thenAnswer((_) => Stream.value(const AuthInitial()));
+      when(() => mockAuthCubit.state).thenReturn(const AuthSuccess(user: User(username: 'testuser')));
+      when(() => mockAuthCubit.stream).thenAnswer((_) => Stream.value(const AuthSuccess(user: User(username: 'testuser'))));
 
       // Act
       await tester.pumpWidget(buildTestWidget());
@@ -124,8 +125,8 @@ void main() {
       when(() => mockWalletCubit.stream)
           .thenAnswer((_) => Stream.value(const WalletLoaded(wallet: walletEntity)));
       when(() => mockWalletCubit.loadBalance()).thenAnswer((_) async => {});
-      when(() => mockAuthCubit.state).thenReturn(const AuthInitial());
-      when(() => mockAuthCubit.stream).thenAnswer((_) => Stream.value(const AuthInitial()));
+      when(() => mockAuthCubit.state).thenReturn(const AuthSuccess(user: User(username: 'testuser')));
+      when(() => mockAuthCubit.stream).thenAnswer((_) => Stream.value(const AuthSuccess(user: User(username: 'testuser'))));
 
       // Act
       await tester.pumpWidget(buildTestWidget());
@@ -143,8 +144,8 @@ void main() {
       when(() => mockWalletCubit.stream).thenAnswer((_) =>
           Stream.value(const ActionFailure(message: 'Failed to load balance')));
       when(() => mockWalletCubit.loadBalance()).thenAnswer((_) async => {});
-      when(() => mockAuthCubit.state).thenReturn(const AuthInitial());
-      when(() => mockAuthCubit.stream).thenAnswer((_) => Stream.value(const AuthInitial()));
+      when(() => mockAuthCubit.state).thenReturn(const AuthSuccess(user: User(username: 'testuser')));
+      when(() => mockAuthCubit.stream).thenAnswer((_) => Stream.value(const AuthSuccess(user: User(username: 'testuser'))));
 
       // Act
       await tester.pumpWidget(buildTestWidget());
@@ -162,8 +163,8 @@ void main() {
       when(() => mockWalletCubit.stream).thenAnswer((_) =>
           Stream.value(const ActionFailure(message: 'Failed to load balance')));
       when(() => mockWalletCubit.loadBalance()).thenAnswer((_) async => {});
-      when(() => mockAuthCubit.state).thenReturn(const AuthInitial());
-      when(() => mockAuthCubit.stream).thenAnswer((_) => Stream.value(const AuthInitial()));
+      when(() => mockAuthCubit.state).thenReturn(const AuthSuccess(user: User(username: 'testuser')));
+      when(() => mockAuthCubit.stream).thenAnswer((_) => Stream.value(const AuthSuccess(user: User(username: 'testuser'))));
 
       // Act
       await tester.pumpWidget(buildTestWidget());
@@ -182,8 +183,8 @@ void main() {
       when(() => mockWalletCubit.stream)
           .thenAnswer((_) => Stream.value(const WalletLoaded(wallet: walletEntity)));
       when(() => mockWalletCubit.loadBalance()).thenAnswer((_) async => {});
-      when(() => mockAuthCubit.state).thenReturn(const AuthInitial());
-      when(() => mockAuthCubit.stream).thenAnswer((_) => Stream.value(const AuthInitial()));
+      when(() => mockAuthCubit.state).thenReturn(const AuthSuccess(user: User(username: 'testuser')));
+      when(() => mockAuthCubit.stream).thenAnswer((_) => Stream.value(const AuthSuccess(user: User(username: 'testuser'))));
 
       // Act
       await tester.pumpWidget(buildTestWidget());
